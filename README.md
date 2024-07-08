@@ -212,20 +212,11 @@ make report
 
 The statically linked binary will be `apps/openssl`.
 
-Contributors
-------------
+Authors
+-------
 
 * Julien Vehent <julien@linuxwall.info> (original author)
 * Hubert Kario <hkario@redhat.com> (co-maintainer)
-* Pepi Zawodsky <git@maclemon.at>
-* Michael Zeltner <m@niij.org>
-* Peter Mosmans <support@go-forward.net>
-* Vincent Riquer <v.riquer@b2f-concept.com>
-* Christian Stadelmann
-* Simon Deziel <simon.deziel@gmail.com>
-* Aaron Zauner <azet@azet.org>
-* Mike <mikedawg@gmail.com>
-* Phil Cohen <phlipper@users.noreply.github.com>
-* Samuel Kleiner <sam@firstbanco.com>
-* Richard Soderberg <https://twitter.com/floatingatoll>
-* Adam Crosby <adamcrosby@users.noreply.github.com>
+* with thanks to all contributors:
+
+<a href="https://github.com/mozilla/cipherscan/graphs/contributors"><img src="https://contrib.rocks/image?repo=mozilla/cipherscan" alt="Contributors generated with https://contrib.rocks"></a>
