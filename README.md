@@ -1,7 +1,7 @@
 CipherScan
 ==========
 
-[![Build Status](https://travis-ci.org/mozilla/cipherscan.svg?branch=master)](https://travis-ci.org/mozilla/cipherscan)
+[![CI](https://github.com/mozilla/cipherscan/actions/workflows/test.yml/badge.svg)](https://github.com/mozilla/cipherscan/actions/workflows/test.yml)
 
 ![cipherscan](https://pbs.twimg.com/media/CPbjvCFW8AAnUK3.png:large)
 
