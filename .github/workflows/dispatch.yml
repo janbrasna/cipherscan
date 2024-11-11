@@ -1,6 +1,11 @@
 name: analyze
 on:
   workflow_dispatch:
+    inputs:
+      hostname:
+        description: domain to analyze for compatibility levels (empty for example.org)
+        required: true
+        default: 'example.org'
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -14,4 +19,4 @@ jobs:
         python -m pip install six
     - name: Analyze
       run: |
-        ./analyze.py -t example.org
+        ./analyze.py -t ${{ github.event.inputs.hostname || 'example.org' }}
