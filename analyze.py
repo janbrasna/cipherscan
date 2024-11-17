@@ -150,8 +150,7 @@ def is_old(results):
     missing_proto = set(old["tls_versions"]) - set(all_proto)
     for proto in missing_proto:
         logging.debug("missing protocol wanted in the old configuration:" + proto)
-        failures[lvl].append('enable ' + proto)
-        isold = False
+        failures[lvl].append('consider enabling ' + proto)
     if not has_3des:
         logging.debug("DES-CBC3-SHA is not supported and required by the old configuration")
         failures[lvl].append("add cipher DES-CBC3-SHA")
@@ -171,7 +170,7 @@ def is_old(results):
     return isold
 
 # is_intermediate is similar to is_old but for intermediate configuration from
-# https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28default.29
+# https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
 def is_intermediate(results):
     logging.debug('entering intermediate evaluation')
     lvl = 'intermediate'
@@ -214,12 +213,13 @@ def is_intermediate(results):
         failures[lvl].append("use a certificate signed with %s" % " or ".join(inter["certificate_signatures"]))
         isinter = False
     if not has_pfs:
-        failures[lvl].append("consider using DHE of at least 2048bits and ECC 256bit and greater")
+        failures[lvl].append("use DHE of at least {dhe}bits and ECC of {ecdhe}bits and greater".format(
+            dhe=inter["dh_param_size"], ecdhe=inter["ecdh_param_size"]))
+        isinter = False
     if not has_ocsp:
         failures[lvl].append("consider enabling OCSP Stapling")
     if results['serverside'] != ('True' if inter['server_preferred_order'] else 'False'):
         failures[lvl].append("enforce server side ordering" if inter['server_preferred_order'] else "enforce client side ordering")
-        isinter = False
     return isinter
 
 # is_modern is similar to is_old but for modern configuration from
@@ -247,7 +247,6 @@ def is_modern(results):
         if conn['pfs'] != 'None':
             if not has_good_pfs(conn['pfs'], modern["dh_param_size"], modern["ecdh_param_size"], True):
                 logging.debug(conn['pfs']+ ' is not a good PFS parameter for the modern configuration')
-                ismodern = False
                 has_pfs = False
         if conn['ocsp_stapling'] == 'False':
             has_ocsp = False
@@ -270,7 +269,6 @@ def is_modern(results):
         failures[lvl].append("consider enabling OCSP Stapling")
     if results['serverside'] != ('True' if modern['server_preferred_order'] else 'False'):
         failures[lvl].append("enforce server side ordering" if modern['server_preferred_order'] else "enforce client side ordering")
-        ismodern = False
     return ismodern
 
 def is_ordered(results, ref_ciphersuite, lvl):
