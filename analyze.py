@@ -63,7 +63,7 @@ def is_fubar(results):
         pubkey_bits = int(conn['pubkey'][0])
         ec_kex = re.match(r"(ECDHE|EECDH|ECDH)-", conn['cipher'])
 
-        if conn['cipher'] not in (set(old["openssl_ciphers"]) | set(inter["openssl_ciphers"]) | set(modern["openssl_ciphers"])):
+        if conn['cipher'] not in (set(old["ciphers"]["openssl"]) | set(inter["ciphers"]["openssl"]) | set(modern["ciphers"]["openssl"])):
             failures[lvl].append("remove cipher " + conn['cipher'])
             logging.debug(conn['cipher'] + ' is in the list of fubar ciphers')
             fubar = True
@@ -121,7 +121,7 @@ def is_old(results):
     for conn in results['ciphersuite']:
         logging.debug('testing connection %s' % conn)
         # flag unwanted ciphers
-        if conn['cipher'] not in old["openssl_ciphers"]:
+        if conn['cipher'] not in old["ciphers"]["openssl"]:
             logging.debug(conn['cipher'] + ' is not in the list of old ciphers')
             failures[lvl].append("remove cipher " + conn['cipher'])
             isold = False
@@ -183,7 +183,7 @@ def is_intermediate(results):
     all_proto = []
     for conn in results['ciphersuite']:
         logging.debug('testing connection %s' % conn)
-        if conn['cipher'] not in inter["openssl_ciphers"]:
+        if conn['cipher'] not in inter["ciphers"]["openssl"]:
             logging.debug(conn['cipher'] + ' is not in the list of intermediate ciphers')
             failures[lvl].append("remove cipher " + conn['cipher'])
             isinter = False
@@ -234,7 +234,7 @@ def is_modern(results):
     all_proto = []
     for conn in results['ciphersuite']:
         logging.debug('testing connection %s' % conn)
-        if conn['cipher'] not in modern["openssl_ciphers"]:
+        if conn['cipher'] not in modern["ciphers"]["openssl"]:
             logging.debug(conn['cipher'] + ' is not in the list of modern ciphers')
             failures[lvl].append("remove cipher " + conn['cipher'])
             ismodern = False
@@ -304,17 +304,17 @@ def evaluate_all(results):
 
     if is_old(results):
         status = "old"
-        if old["server_preferred_order"] and not is_ordered(results, old["openssl_ciphers"], "old"):
+        if old["server_preferred_order"] and not is_ordered(results, old["ciphers"]["openssl"], "old"):
             status = "old with bad ordering"
 
     if is_intermediate(results):
         status = "intermediate"
-        if inter["server_preferred_order"] and not is_ordered(results, inter["openssl_ciphers"], "intermediate"):
+        if inter["server_preferred_order"] and not is_ordered(results, inter["ciphers"]["openssl"], "intermediate"):
             status = "intermediate with bad ordering"
 
     if is_modern(results):
         status = "modern"
-        if modern["server_preferred_order"] and not is_ordered(results, modern["openssl_ciphers"], "modern"):
+        if modern["server_preferred_order"] and not is_ordered(results, modern["ciphers"]["openssl"], "modern"):
             status = "modern with bad ordering"
 
     if is_fubar(results):
@@ -396,7 +396,7 @@ def process_results(data, level=None, do_json=False, do_nagios=False):
     return exit_status
 
 def build_ciphers_lists():
-    sstlsurl = "https://statics.tls.security.mozilla.org/server-side-tls-conf.json"
+    sstlsurl = "https://ssl-config.mozilla.org/guidelines/5.7.json"
     conf = dict()
     try:
         raw = urlopen(sstlsurl).read()
