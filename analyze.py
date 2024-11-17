@@ -114,7 +114,7 @@ def is_old(results):
     lvl = 'old'
     isold = True
     has_3des = False
-    has_sha1 = True
+    has_sigalg = True
     has_pfs = True
     has_ocsp = True
     all_proto = []
@@ -131,11 +131,9 @@ def is_old(results):
         for proto in conn['protocols']:
             if proto not in all_proto:
                 all_proto.append(proto)
-        # verify required sha1 signature is used
-        if 'sha1WithRSAEncryption' not in conn['sigalg']:
+        if conn['sigalg'][0] not in old["certificate_signatures"]:
             logging.debug(conn['sigalg'][0] + ' is a not an old signature')
-            has_sha1 = False
-        # verify required pfs parameter is used
+            has_sigalg = False
         if conn['pfs'] != 'None':
             if not has_good_pfs(conn['pfs'], old["dh_param_size"], old["ecdh_param_size"], True):
                 logging.debug(conn['pfs']+ ' is not a good PFS parameter for the old configuration')
@@ -155,8 +153,8 @@ def is_old(results):
         logging.debug("DES-CBC3-SHA is not supported and required by the old configuration")
         failures[lvl].append("add cipher DES-CBC3-SHA")
         isold = False
-    if not has_sha1:
-        failures[lvl].append("use a certificate with sha1WithRSAEncryption signature")
+    if not has_sigalg:
+        failures[lvl].append("use a certificate signed with %s" % " or ".join(inter["certificate_signatures"]))
         isold = False
     if not has_pfs:
         failures[lvl].append("use DHE of {dhe}bits and ECC of {ecdhe}bits".format(
@@ -165,7 +163,7 @@ def is_old(results):
     if not has_ocsp:
         failures[lvl].append("consider enabling OCSP Stapling")
     if results['serverside'] != ('True' if old['server_preferred_order'] else 'False'):
-        failures[lvl].append("enforce server side ordering" if old['server_preferred_order'] else "enforce client side ordering")
+        failures[lvl].append("enforce server side ordering" if old['server_preferred_order'] else "allow client preference")
         isold = False
     return isold
 
@@ -219,7 +217,7 @@ def is_intermediate(results):
     if not has_ocsp:
         failures[lvl].append("consider enabling OCSP Stapling")
     if results['serverside'] != ('True' if inter['server_preferred_order'] else 'False'):
-        failures[lvl].append("enforce server side ordering" if inter['server_preferred_order'] else "enforce client side ordering")
+        failures[lvl].append("enforce server side ordering" if inter['server_preferred_order'] else "allow client preference")
     return isinter
 
 # is_modern is similar to is_old but for modern configuration from
@@ -268,7 +266,7 @@ def is_modern(results):
     if not has_ocsp:
         failures[lvl].append("consider enabling OCSP Stapling")
     if results['serverside'] != ('True' if modern['server_preferred_order'] else 'False'):
-        failures[lvl].append("enforce server side ordering" if modern['server_preferred_order'] else "enforce client side ordering")
+        failures[lvl].append("enforce server side ordering" if modern['server_preferred_order'] else "allow client preference")
     return ismodern
 
 def is_ordered(results, ref_ciphersuite, lvl):
