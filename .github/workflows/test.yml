@@ -1,18 +1,23 @@
 name: cipherscan
 
 on:
-  workflow_dispatch:
   pull_request:
   push:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      hostname:
+        description: hostname to cscan (empty for example.org)
+        required: false
+        default: 'example.org'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.10", "3.12"]
+        python-version: ["3.8", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
     - name: Test Python ${{ matrix.python-version }}
@@ -22,6 +27,6 @@ jobs:
     - name: Install
       run: |
         python -m pip install six
-    - name: Scan
+    - name: Scan ${{ github.event.inputs.hostname }}
       run: |
-        ./cipherscan example.org
+        ./cipherscan ${{ github.event.inputs.hostname || 'example.org' }}
