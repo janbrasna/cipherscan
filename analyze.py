@@ -154,7 +154,7 @@ def is_old(results):
         failures[lvl].append("add cipher DES-CBC3-SHA")
         isold = False
     if not has_sigalg:
-        failures[lvl].append("use a certificate signed with %s" % " or ".join(inter["certificate_signatures"]))
+        failures[lvl].append("use a certificate signed with %s" % " or ".join(old["certificate_signatures"]))
         isold = False
     if not has_pfs:
         failures[lvl].append("use DHE of {dhe}bits and ECC of {ecdhe}bits".format(
