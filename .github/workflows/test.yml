@@ -7,21 +7,25 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.8", "3.10", "3.12"]
+        python-version: ["3.10", "3.12", "3.14"]
     steps:
-    - uses: actions/checkout@v4
-    - name: Test Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+    - uses: actions/checkout@v6
+    - name: Use Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install
+    - name: Install dependencies
       run: |
-        python -m pip install six
-    - name: Scan
+        pip install six
+    - name: Scan «example.org»
       run: |
         ./cipherscan example.org
